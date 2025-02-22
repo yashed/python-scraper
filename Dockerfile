@@ -16,17 +16,32 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxtst6 \
     libxi6 \
+    libcups2 \
+    libgbm1 \
+    libgtk-3-0 \
+    libpango-1.0-0 \
+    libvulkan1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxkbcommon0 \
+    libxrandr2 \
+    xdg-utils \
+    fonts-liberation \
+    libatspi2.0-0 \
+    libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Google Chrome
 RUN wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-    && dpkg -i /tmp/chrome.deb || apt-get install -f -y \
+    && dpkg -i /tmp/chrome.deb && apt-get install -f -y \
     && rm /tmp/chrome.deb
 
-# Install ChromeDriver
-RUN CHROME_VERSION=$(google-chrome --version | grep -oE "[0-9]+\.[0-9]+\.[0-9]+") \
-    && wget -q -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION})/chromedriver_linux64.zip" \
+# Install ChromeDriver (pinned to version 133.0.6943.126)
+RUN wget -q -O /tmp/chromedriver.zip "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip" \
     && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
+    && mv /usr/local/bin/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
+    && rm -rf /usr/local/bin/chromedriver-linux64 \
     && rm /tmp/chromedriver.zip \
     && chmod +x /usr/local/bin/chromedriver
 
@@ -36,7 +51,7 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create a new user with UID 10016 for security
+# Create a new user with UID 10016 for security (Choreo recommendation)
 RUN addgroup --gid 10016 choreo && \
     adduser --disabled-password --no-create-home --uid 10016 --ingroup choreo choreouser
 

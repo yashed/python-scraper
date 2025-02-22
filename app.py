@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -10,20 +10,12 @@ import time
 import random
 from fake_useragent import UserAgent
 import logging
-from pydantic import BaseModel
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Web Scraper Service")
-
-# Request model to validate incoming URL
-class ScrapeRequest(BaseModel):
-    url: str
-
-def scrape_website(url: str) -> str:
-    """Scrape website content using Requests or Selenium."""
+def scrape_website(url):
     ua = UserAgent()
     headers = {
         'User-Agent': ua.random,
@@ -32,7 +24,7 @@ def scrape_website(url: str) -> str:
         'Referer': 'https://www.google.com/'
     }
     
-    # First attempt: Static scraping with Requests
+    # First attempt: Try static scraping with Requests
     try:
         logger.info(f"Attempting static scrape of {url}")
         time.sleep(random.uniform(1, 3))
@@ -47,7 +39,7 @@ def scrape_website(url: str) -> str:
     except requests.exceptions.RequestException as e:
         logger.warning(f"Static scrape failed: {str(e)}")
     
-    # Second attempt: Dynamic scraping with Selenium
+    # Second attempt: Use Selenium for dynamic/JS-rendered pages
     try:
         logger.info(f"Attempting dynamic scrape of {url} with Selenium")
         chrome_options = Options()
@@ -56,6 +48,7 @@ def scrape_website(url: str) -> str:
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        
         driver = webdriver.Chrome(options=chrome_options)
         try:
             time.sleep(random.uniform(1, 3))
@@ -79,24 +72,29 @@ def scrape_website(url: str) -> str:
         logger.error(f"Dynamic scrape failed: {str(e)}")
         return f"Failed to scrape {url}: {str(e)}"
 
-@app.post("/scrape")
-async def scrape_endpoint(request: ScrapeRequest):
-    """Endpoint to scrape a website given a URL."""
-    if not request.url:
-        raise HTTPException(status_code=400, detail="URL is required")
-    
-    result = scrape_website(request.url)
-    if result.startswith("Failed to scrape"):
-        raise HTTPException(status_code=500, detail=result)
-    
-    return {
-        "status": "success",
-        "url": request.url,
-        "word_count": len(result.split()),
-        "preview": result[:500] + "..." if len(result) > 500 else result,
-        "full_content": result
-    }
+# Streamlit app
+def main():
+    st.title("Web Scraper")
+    st.write("Enter a URL to scrape its content.")
+
+    url = st.text_input("Website URL", placeholder="https://example.com")
+    if st.button("Scrape"):
+        if not url:
+            st.error("Please enter a valid URL.")
+        else:
+            with st.spinner("Scraping the website, please wait..."):
+                result = scrape_website(url)
+            st.subheader("Scraped Content")
+            if result.startswith("Failed to scrape"):
+                st.error(result)
+            else:
+                st.write("**Status:** Success")
+                st.write(f"**URL Scraped:** {url}")
+                st.write(f"**Word Count:** {len(result.split())}")
+                st.write("**Preview:**")
+                st.write(result[:500] + "..." if len(result) > 500 else result)
+                with st.expander("View Full Content", expanded=False):
+                    st.text_area("Full Scraped Text", result, height=300)
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    main()
