@@ -1,4 +1,4 @@
-version: 0.1
+version: 1.0
 id: web-scraper
 name: Web Scraper
 description: A Streamlit-based web scraper with Selenium
