@@ -1,13 +1,10 @@
 schemaVersion: 1.1
-endpoints:
-  - name: scrape_service
-    displayName: Scraping Service
-    service:
-      port: 8080  
-    type: REST
-    networkVisibilities:
-      - Public
-    schemaFilePath: openapi.yaml
+name: scrape-web-app
+displayName: Scraping Web App
+description: A FastAPI-based web scraping application
+type: WebApplication  # Changed from service to web application
+port: 8080  # Matches Dockerfile
+networkVisibility: Public
 build:
   docker:
     dockerfilePath: ./Dockerfile

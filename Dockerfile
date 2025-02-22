@@ -46,8 +46,6 @@ USER 10016
 # Copy the application code
 COPY app.py .
 
-# Expose FastAPI port
-EXPOSE 8080
+EXPOSE 8080  
 
-# Command to run the FastAPI app
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0"]
