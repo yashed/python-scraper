@@ -1,14 +1,14 @@
-version: 1.0
-id: web-scraper
-name: Web Scraper
-description: A Streamlit-based web scraper with Selenium
-repoPath: .
-buildPreset: docker
-ports:
-  - name: http
-    containerPort: 8080  
-    ingressPath: /
-buildConfig:
+schemaVersion: 1.1
+endpoints:
+  - name: scraping_service
+    displayName: Scraping Service
+    service:
+      port: 8080  
+    type: REST
+    networkVisibilities:
+      - Public
+    schemaFilePath: openapi.yaml
+build:
   docker:
     dockerfilePath: ./Dockerfile
     buildContextPath: .
