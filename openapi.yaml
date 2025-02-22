@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: Web Scraper Service
+  description: A service to scrape website content given a URL
+  version: 1.0.0
+paths:
+  /scrape:
+    post:
+      summary: Scrape website content
+      operationId: scrapeWebsite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  example: "https://example.com"
+              required:
+                - url
+      responses:
+        '200':
+          description: Successful response with scraped content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  url:
+                    type: string
+                    example: "https://example.com"
+                  word_count:
+                    type: integer
+                    example: 150
+                  preview:
+                    type: string
+                    example: "This is a preview of the scraped content..."
+                  full_content:
+                    type: string
+                    example: "This is the full scraped content from the website..."
+                required:
+                  - status
+                  - url
+                  - word_count
+                  - preview
+                  - full_content
+        '400':
+          description: Bad request (e.g., missing URL)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "URL is required"
+        '500':
+          description: Server error (e.g., scraping failed)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Failed to scrape https://example.com: Error message"
+components:
+  schemas: {}
