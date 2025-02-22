@@ -6,7 +6,7 @@ repoPath: .
 buildPreset: docker
 ports:
   - name: http
-    containerPort: 8501
+    containerPort: 8080  
     ingressPath: /
 buildConfig:
   docker:
