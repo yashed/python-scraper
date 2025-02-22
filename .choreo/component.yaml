@@ -1,6 +1,6 @@
 schemaVersion: 1.1
 endpoints:
-  - name: scraping_service
+  - name: scrape_service
     displayName: Scraping Service
     service:
       port: 8080  
