@@ -1,0 +1,14 @@
+version: 0.1
+id: web-scraper
+name: Web Scraper
+description: A Streamlit-based web scraper with Selenium
+repoPath: .
+buildPreset: docker
+ports:
+  - name: http
+    containerPort: 8501
+    ingressPath: /
+buildConfig:
+  docker:
+    dockerfilePath: ./Dockerfile
+    buildContextPath: .
