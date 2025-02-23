@@ -50,11 +50,15 @@ def scrape_website(url):
     try:
         logger.info(f"Attempting dynamic scrape of {url} with Selenium")
         chrome_options = Options()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument(f'user-agent={ua.random}')
-        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        chrome_options.add_argument('--headless=new')  # New headless mode
         chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--disable-software-rasterizer')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        chrome_options.add_argument('--remote-debugging-port=9222')  
+        chrome_options.add_argument(f'user-agent={ua.random}')
+
         
         driver = webdriver.Chrome(options=chrome_options)
         try:
