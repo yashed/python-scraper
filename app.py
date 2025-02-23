@@ -11,8 +11,6 @@ import random
 from fake_useragent import UserAgent
 import logging
 from pydantic import BaseModel
-import tempfile
-import os
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO)
@@ -58,9 +56,8 @@ def scrape_website(url: str) -> str:
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        # Use a temporary directory for user data
-        temp_dir = tempfile.mkdtemp(prefix='chrome-data-')
-        chrome_options.add_argument(f'--user-data-dir={temp_dir}')
+        # Explicitly disable user data directory to avoid conflicts
+        chrome_options.add_argument('--user-data-dir=/tmp/chrome-data-' + str(random.randint(1000, 9999)))
         driver = webdriver.Chrome(options=chrome_options)
         try:
             time.sleep(random.uniform(1, 3))
@@ -80,10 +77,6 @@ def scrape_website(url: str) -> str:
                 raise Exception("Content too short, possible bot detection")
         finally:
             driver.quit()
-            # Clean up temporary directory
-            if os.path.exists(temp_dir):
-                import shutil
-                shutil.rmtree(temp_dir, ignore_errors=True)
     except Exception as e:
         logger.error(f"Dynamic scrape failed: {str(e)}")
         return f"Failed to scrape {url}: {str(e)}"
