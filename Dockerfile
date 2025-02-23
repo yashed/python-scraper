@@ -56,7 +56,7 @@ RUN addgroup --gid 10016 choreo && \
     adduser --disabled-password --no-create-home --uid 10016 --ingroup choreo choreouser
 
 # Set the user for the container
-USER 10016
+# USER 10016
 
 # Copy the application code
 COPY app.py .
