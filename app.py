@@ -22,8 +22,7 @@ app = FastAPI(title="Web Scraper Service")
 class ScrapeRequest(BaseModel):
     url: str
 
-def scrape_website(url: str) -> str:
-    """Scrape website content using Requests or Selenium."""
+def scrape_website(url):
     ua = UserAgent()
     headers = {
         'User-Agent': ua.random,
@@ -32,7 +31,7 @@ def scrape_website(url: str) -> str:
         'Referer': 'https://www.google.com/'
     }
     
-    # First attempt: Static scraping with Requests
+    # First attempt: Try static scraping with Requests
     try:
         logger.info(f"Attempting static scrape of {url}")
         time.sleep(random.uniform(1, 3))
@@ -47,7 +46,7 @@ def scrape_website(url: str) -> str:
     except requests.exceptions.RequestException as e:
         logger.warning(f"Static scrape failed: {str(e)}")
     
-    # Second attempt: Dynamic scraping with Selenium
+    # Second attempt: Use Selenium for dynamic/JS-rendered pages
     try:
         logger.info(f"Attempting dynamic scrape of {url} with Selenium")
         chrome_options = Options()
@@ -56,8 +55,7 @@ def scrape_website(url: str) -> str:
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        # Explicitly disable user data directory to avoid conflicts
-        chrome_options.add_argument('--user-data-dir=/tmp/chrome-data-' + str(random.randint(1000, 9999)))
+        
         driver = webdriver.Chrome(options=chrome_options)
         try:
             time.sleep(random.uniform(1, 3))
@@ -81,6 +79,7 @@ def scrape_website(url: str) -> str:
         logger.error(f"Dynamic scrape failed: {str(e)}")
         return f"Failed to scrape {url}: {str(e)}"
 
+
 @app.post("/scrape")
 async def scrape_endpoint(request: ScrapeRequest):
     """Endpoint to scrape a website given a URL."""
@@ -88,6 +87,7 @@ async def scrape_endpoint(request: ScrapeRequest):
         raise HTTPException(status_code=400, detail="URL is required")
     
     result = scrape_website(request.url)
+    print(result)
     if result.startswith("Failed to scrape"):
         raise HTTPException(status_code=500, detail=result)
     
