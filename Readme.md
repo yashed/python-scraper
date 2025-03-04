@@ -14,7 +14,7 @@ A Streamlit app to scrape websites using Requests and Selenium.
 1. Clone repo: `git clone <repo-url>`
 2. Install: `pip install -r requirements.txt`
 3. Install Chrome & ChromeDriver
-4. Run: `streamlit run app.py`
+4. Run: `streamlit run streamlit_app.py`
 5. Open: `http://localhost:8501`
 
 ## Deploy on Choreo
